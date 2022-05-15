@@ -28,7 +28,22 @@ async function run() {
 
         });
         app.get('/available', async (req, res) => {
-            const data = req.query.date || ''
+            const date = req.query.date || 'May 15, 2022';
+            const services = await serviceCollection.find().toArray();
+            const query = { date: date };
+            const bookings = await bookingCollection.find(query).toArray();
+            services.forEach(service => {
+                const serviceBookings = bookings.filter(b => b.treatment === service.name);
+                // const booked = serviceBookings.map(s => s.slot);
+                // service.booked = booked;
+                // service.booked = serviceBookings.map(s => s.slot);
+                const booked = serviceBookings.map(s => s.slot);
+                const available = service.map(s => !booked.includes(s));
+                service.available = available;
+
+            })
+
+            res.send(services);
         })
         app.post('/booking', async (req, res) => {
             const booking = req.body;
