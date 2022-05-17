@@ -27,8 +27,7 @@ async function run() {
             res.send(services)
 
         });
-
-        app.get('/user/:email', (req, res) => {
+        app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
             const filter = { email: email }
@@ -38,7 +37,7 @@ async function run() {
             };
             const result = await userCollection.updateOne(filter, updateDoc, options);
             res.send(result)
-        })
+        });
 
         app.get('/available', async (req, res) => {
             const date = req.query.date;
