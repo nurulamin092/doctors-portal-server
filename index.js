@@ -17,17 +17,29 @@ async function run() {
     try {
         await client.connect();
         const serviceCollection = client.db('doctors_portal').collection('services');
-        const bookingCollection = client.db('doctors_portal').collection('bookings')
+        const bookingCollection = client.db('doctors_portal').collection('bookings');
+        const userCollection = client.db('doctors_portal').collection('users');
 
         app.get('/service', async (req, res) => {
-            //console.log(services);
             const query = {};
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
-            console.log(services);
             res.send(services)
 
         });
+
+        app.get('/user/:email', (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email }
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
         app.get('/available', async (req, res) => {
             const date = req.query.date;
             const services = await serviceCollection.find().toArray();
